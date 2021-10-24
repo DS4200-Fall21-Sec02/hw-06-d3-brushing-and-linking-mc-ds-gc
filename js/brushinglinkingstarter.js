@@ -115,14 +115,14 @@ d3.csv("data/iris.csv").then((data) => {
       var yKey1 = "Petal_Width";
 
       //Add X axis
-      var x1 = d3
+      var x2 = d3
       .scaleLinear()
       .domain(d3.extent(data.map((val) => val[xKey1])))
       .range([0, width]);
       svg2
       .append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x1))
+      .call(d3.axisBottom(x2))
       .call((g) =>
           g
           .append("text")
@@ -134,13 +134,13 @@ d3.csv("data/iris.csv").then((data) => {
       );
 
       //Add Y axis
-      var y1 = d3
+      var y2 = d3
       .scaleLinear()
       .domain(d3.extent(data.map((val) => val[yKey1])))
       .range([height, 0]);
       svg2
       .append("g")
-      .call(d3.axisLeft(y1))
+      .call(d3.axisLeft(y2))
       .call((g) =>
           g
           .append("text")
@@ -152,7 +152,7 @@ d3.csv("data/iris.csv").then((data) => {
       );
 
       // Add dots
-      var myCircle1 = svg2
+      var myCircle2 = svg2
       .append("g")
       .selectAll("circle")
       .data(data)
@@ -160,10 +160,10 @@ d3.csv("data/iris.csv").then((data) => {
       .append("circle")
       .attr("id", (d) => d.id)
       .attr("cx", function (d) {
-        return x1(d[xKey1]);
+        return x2(d[xKey1]);
       })
       .attr("cy", function (d) {
-        return y1(d[yKey1]);
+        return y2(d[yKey1]);
       })
       .attr("r", 8)
       .style("fill", function (d) {
@@ -177,7 +177,6 @@ d3.csv("data/iris.csv").then((data) => {
   d3.csv("data/iris.csv").then(function (data) {
 
     var dataNest = d3.group(data, d => d.Species)
-
 
     console.log(dataNest);
 
@@ -227,49 +226,55 @@ d3.csv("data/iris.csv").then((data) => {
     .style("fill", function (d) {
       return color(d[0]);
     })
-  })
 
-  //Brushing Code---------------------------------------------------------------------------------------------
+    //Brushing Code---------------------------------------------------------------------------------------------
 
-  //Removes existing brushes from svg
-  function clear() {
-    svg1.call(brush1.move, null);
-    svg2.call(brush2.move, null);
-  }
+    //Removes existing brushes from svg
+    // function clear() {
+    //   svg1.call(brush1.move, null);
+    //   svg2.call(brush2.move, null);
+    //   svg3.call(brush3.move, null)
+    // }
 
-  //Is called when we brush on scatterplot #1
-  function updateChart1(brushEvent) {
-    extent = brushEvent.selection;
+    // let brush1 = d3.brush();
 
-    //TODO: Check all the circles that are within the brush region in Scatterplot 1
+    svg1
+    .call(d3.brush()                 // Add the brush feature using the d3.brush function
+        .extent( [ [0,0], [width,height] ] ) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+        .on("start brush", updateChart1) // Each time the brush selection changes, trigger the 'updateChart' function
+    )
 
-    //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
+    //Is called when we brush on scatterplot #1
+    function updateChart1(selection) {
+      if (selection === null) return;
+      //TODO: Check all the circles that are within the brush region in Scatterplot 1
+      myCircle1.classed("selected", function (d) {
+        return isBrushed(selection, x1(d["Sepal_Length"]), y1(d["Petal_Length"]))
+      });
+      //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
 
-  }
-
-  //Is called when we brush on scatterplot #2
-  function updateChart2(brushEvent) {
-    extent = brushEvent.selection;
-    var selectedSpecies = new Set();
-
-    //TODO: Check all the circles that are within the brush region in Scatterplot 2
-
-    //TODO: Select all the data points in Scatterplot 1 which have the same id as those selected in Scatterplot 2
-
-    //TODO: Select bars in bar chart based on species selected in Scatterplot 2
-
-  }
-
-  //Finds dots within the brushed region
-  function isBrushed(brush_coords, cx, cy) {
-    if (brush_coords === null) {
-      return;
     }
 
-    var x0 = brush_coords[0][0],
-        x1 = brush_coords[1][0],
-        y0 = brush_coords[0][1],
-        y1 = brush_coords[1][1];
-    return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1; // This return TRUE or FALSE depending on if the points is in the selected area
-  }
+    //Is called when we brush on scatterplot #2
+    function updateChart2(brushEvent) {
+      extent = brushEvent.selection;
+      var selectedSpecies = new Set();
+
+      //TODO: Check all the circles that are within the brush region in Scatterplot 2
+
+      //TODO: Select all the data points in Scatterplot 1 which have the same id as those selected in Scatterplot 2
+
+      //TODO: Select bars in bar chart based on species selected in Scatterplot 2
+
+    }
+
+    //Finds dots within the brushed region
+    function isBrushed(brush_coords, cx, cy) {
+        let x0 = brush_coords[0][0];
+        let x1 = brush_coords[1][0];
+        let y0 = brush_coords[0][1];
+        let y1 = brush_coords[1][1];
+        return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
+    }
+  })
 });
