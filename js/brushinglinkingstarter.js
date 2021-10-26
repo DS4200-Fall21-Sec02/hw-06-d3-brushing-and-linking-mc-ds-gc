@@ -252,7 +252,6 @@ d3.csv("data/iris.csv").then((data) => {
         return isBrushed(selection, x1(d["Sepal_Length"]), y1(d["Petal_Length"]))
       });
       //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
-
     }
 
     //Is called when we brush on scatterplot #2
@@ -269,11 +268,12 @@ d3.csv("data/iris.csv").then((data) => {
     }
 
     //Finds dots within the brushed region
-    function isBrushed(brush_coords, cx, cy) {
-        let x0 = brush_coords[0][0];
-        let x1 = brush_coords[1][0];
-        let y0 = brush_coords[0][1];
-        let y1 = brush_coords[1][1];
+    function isBrushed(selection, cx, cy) {
+      console.log(selection.selection)
+        let x0 = selection.selection[0][0];
+        let x1 = selection.selection[1][0];
+        let y0 = selection.selection[0][1];
+        let y1 = selection.selection[1][1];
         return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
     }
   })
