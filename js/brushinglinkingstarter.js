@@ -237,17 +237,25 @@ d3.csv("data/iris.csv").then((data) => {
       brush1                // Add the brush feature using the d3.brush function
       .extent([[0, 0], [width, height]]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
       .on("start brush", updateChart1) // Each time the brush selection changes, trigger the 'updateChart' function
+
   )
+
+
 
   svg2
   .call(
       brush2                // Add the brush feature using the d3.brush function
       .extent([[0, 0], [width, height]]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-      .on("start brush", updateChart2) // Each time the brush selection changes, trigger the 'updateChart' function
+      .on("start brush", updateChart2)
+       // Each time the brush selection changes, trigger the 'updateChart' function
   )
+
+
 
   //Is called when we brush on scatterplot #1
   function updateChart1(brushEvent) {
+     svg2.call(brush2.clear)
+    
     if (brushEvent === null) {
       return;
     }
@@ -271,6 +279,8 @@ d3.csv("data/iris.csv").then((data) => {
 
   //Is called when we brush on scatterplot #2
   function updateChart2(brushEvent) {
+
+
     if (brushEvent === null) {
       return;
     }
@@ -281,7 +291,9 @@ d3.csv("data/iris.csv").then((data) => {
         species.push(d["Species"]);
         return true;
       }
-    });
+    }
+
+    );
     //TODO: Select all the data points in Scatterplot 2 which have the same id as those selected in Scatterplot 1
     myCircle2.classed("selected", function (d) {
       return isBrushed(brushEvent, x2(d["Sepal_Width"]), y2(d["Petal_Width"]))
@@ -291,14 +303,17 @@ d3.csv("data/iris.csv").then((data) => {
     bars.classed("selected", function (d) {
       return species.includes(d[0])
     });
+
+
   }
 
   //Finds dots within the brushed region
   function isBrushed(brushEvent, cx, cy) {
+    if(brushEvent.selection !== null) {
     let x0 = brushEvent.selection[0][0];
     let x1 = brushEvent.selection[1][0];
     let y0 = brushEvent.selection[0][1];
     let y1 = brushEvent.selection[1][1];
     return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
-  }
+  }}
 });
